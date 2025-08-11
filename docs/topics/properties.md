@@ -352,75 +352,134 @@ is one source of truth but two public views.
 
 ## Compile-time constants
 
-If the value of a read-only property is known at compile time, mark it as a _compile time constant_ using the `const` modifier.
-Such a property needs to fulfill the following requirements:
+If the value of a read-only property is known at compile time, mark it as a _compile-time constant_ using the `const` modifier.
+Compile-time constants are inlined at compile time, so every reference is replaced with its actual value. They are accessed
+more efficiently as no getter is called and no memory is allocated for the property.
 
-* It must be a top-level property, or a member of an [`object` declaration](object-declarations.md#object-declarations-overview) or a _[companion object](object-declarations.md#companion-objects)_.
-* It must be initialized with a value of type `String` or a primitive type
-* It cannot be a custom getter
+```kotlin
+// File: AppConfig.kt
+package com.example
 
-The compiler will inline usages of the constant, replacing the reference to the constant with its actual value. However, the field will not be removed and therefore can be interacted with using [reflection](reflection.md).
+// Compile-time constant
+const val MAX_LOGIN_ATTEMPTS = 3
+```
 
-Such properties can also be used in annotations:
+Compile-time constants must satisfy the following requirements:
+
+* They must be either a top-level property, or a member of an [`object` declaration](object-declarations.md#object-declarations-overview) or a _[companion object](object-declarations.md#companion-objects)_.
+* They must be initialized with a value of type `String` or a primitive type.
+* They can't have a custom getter.
+
+> A top-level property is a property declared directly in a `.kt` file, not inside a class, interface, or object.
+> Think of it as a global variable or constant that belongs to the package.
+> 
+{style="tip"}
+
+Compile-time constants still have a field, so you can interact with them using [reflection](reflection.md).
+
+These properties have the added benefit that they can also be used in annotations:
 
 ```kotlin
 const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 
-@Deprecated(SUBSYSTEM_DEPRECATED) fun foo() { ... }
+@Deprecated(SUBSYSTEM_DEPRECATED) fun processLegacyOrders() { ... }
 ```
 
 ## Late-initialized properties and variables
 
 Normally, properties declared as having a non-nullable type must be initialized in the constructor.
-However, it is often the case that doing so is not convenient. For example, properties can be initialized through dependency
-injection, or in the setup method of a unit test. In these cases, you cannot supply a non-nullable initializer in the constructor,
+However, it's often the case that doing so isn't convenient. For example, properties can be initialized through dependency
+injection, or in the setup method of a unit test. In these cases, you can't supply a non-nullable initializer in the constructor,
 but you still want to avoid null checks when referencing the property inside the body of a class.
 
 To handle such cases, you can mark the property with the `lateinit` modifier:
 
 ```kotlin
-public class MyTest {
-    lateinit var subject: TestSubject
+public class OrderServiceTest {
+    lateinit var orderService: OrderService
 
     @SetUp fun setup() {
-        subject = TestSubject()
+        orderService = OrderService()
     }
 
-    @Test fun test() {
-        subject.method()  // dereference directly
+    @Test fun processesOrderSuccessfully() {
+        // Dereference directly without checking for null
+        // or initialization
+        orderService.processOrder()  
     }
 }
 ```
 
-This modifier can be used on `var` properties declared inside the body of a class (not in the primary constructor,
-and only when the property does not have a custom getter or setter), as well as for top-level properties and local variables.
-The type of the property or variable must be non-nullable, and it must not be a primitive type.
+The `lateinit` modifier can be used on `var` properties declared inside top-level properties and local variables, as well as the body of a class.
+For classes, the property can't be declared in the primary constructor, and it must not have a custom getter or setter.
+In addition, the type of the property or variable must be non-nullable, and it must not be a primitive type.
 
 Accessing a `lateinit` property before it has been initialized throws a special exception that clearly identifies the property
 being accessed and the fact that it hasn't been initialized.
 
-### Checking whether a lateinit var is initialized
-
-To check whether a `lateinit var` has already been initialized, use `.isInitialized` on the [reference to that property](reflection.md#property-references):
-
 ```kotlin
-if (foo::bar.isInitialized) {
-    println(foo.bar)
+class ReportGenerator {
+    lateinit var report: String
+
+    fun printReport() {
+        // Access before initialization
+        println(report)
+    }
+}
+
+fun main() {
+    val generator = ReportGenerator()
+    generator.printReport()
+    // Exception in thread "main" kotlin.UninitializedPropertyAccessException: lateinit property report has not been initialized
+    //   at ReportGenerator.getReport (File.kt:2) 
 }
 ```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property" validate="false"}
 
-This check is only available for properties that are lexically accessible when declared in the same type, in one of the
-outer types, or at top level in the same file.
+### Checking whether a lateinit var is initialized
+
+To check whether a `lateinit var` has already been initialized, use the [`isInitialized`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-lazy/is-initialized.html)
+property on the [reference to that property](reflection.md#property-references):
+
+```kotlin
+class WeatherStation {
+    lateinit var latestReading: String
+
+    fun printReading() {
+        // Check whether the property is initialized
+        if (this::latestReading.isInitialized) {
+            println("Latest reading: $latestReading")
+        } else {
+            println("No reading available")
+        }
+    }
+}
+
+fun main() {
+    val station = WeatherStation()
+
+    station.printReading()
+    // No reading available
+    station.latestReading = "22°C, sunny"
+    station.printReading()
+    // Latest reading: 22°C, sunny
+}
+```
+{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property-check-initialization"}
+
+You can only use `isInitialized` on a property if you can already access the property in your code. The property must be declared
+in the same class, in an outer class, or as a top-level property in the same file.
 
 ## Overriding properties
 
-See [Overriding properties](inheritance.md#overriding-properties)
+See [Overriding properties](inheritance.md#overriding-properties).
 
 ## Delegated properties
 
-The most common kind of property simply reads from (and maybe writes to) a backing field, but custom getters and setters
-allow you to use properties so one can implement any sort of behavior of a property.
-Somewhere in between the simplicity of the first kind and variety of the second, there are common patterns for what properties
-can do. A few examples: lazy values, reading from a map by a given key, accessing a database, notifying a listener on access.
+The most common kind of property simply reads from (and possibly writes to) a backing field using the default getter and setter, while
+custom getters and setters let you define any kind of property behavior.
 
-Such common behaviors can be implemented as libraries using [delegated properties](delegated-properties.md).
+Between these two extremes, there are common patterns for how properties work. Examples include computing a value lazily,
+reading from a map by a given key, accessing a database, or notifying a listener when a property is accessed.
+
+You can implement these common behaviors as libraries using [delegated properties](delegated-properties.md).
