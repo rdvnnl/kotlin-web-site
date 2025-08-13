@@ -47,7 +47,7 @@ object Company {
 
 // Class implementing the interface
 class PersonContact : ContactInfo {
-    override val email: String = "sherlock@detective.com"
+    override val email: String = "sherlock@example.com"
 }
 ```
 
@@ -70,7 +70,7 @@ object Company {
 }
 
 class PersonContact : ContactInfo {
-    override val email: String = "sherlock@detective.com"
+    override val email: String = "sherlock@example.com"
 }
 
 //sampleStart
@@ -108,7 +108,8 @@ Declaring the property type is optional if it can be inferred from the initializ
 
 ```kotlin
 var initialized = 1 // The inferred type is Int
-var allByDefault    // ERROR: This variable must either have an explicit type or be initialized.
+var allByDefault    
+// ERROR: This variable must either have an explicit type or be initialized.
 ```
 {validate="false"}
 
@@ -233,7 +234,7 @@ fun main() {
 ### Backing fields
 
 In Kotlin, accessors use backing fields to hold the property's value in memory. Backing fields are useful
-when you want to add extra logic to your getter and setter without causing an infinite loop. Or if you want to trigger
+when you want to add extra logic to your getter and setter or if you want to trigger
 an additional action when a property is modified.
 
 You can't declare backing fields directly. Kotlin generates them when it's necessary. You can reference the backing field in accessors using
@@ -273,7 +274,8 @@ fun main() {
 ### Backing properties
 
 In some cases, you might want more flexibility than using a backing field can provide. For example, if you have an API
-where you want to be able to modify the property internally but not externally. In such cases, you can use a _backing property_.
+where you want to be able to modify the property internally but not externally. In such cases, you can use a coding pattern
+called a _backing property_.
 
 For example, you have a `ShoppingCart` class with an `items` property that contains everything inside the shopping cart.
 You want to make the `items` property read-only outside the class, but you want to allow one "approved" way for the user to modify
@@ -316,9 +318,11 @@ fun main() {
 The user can only add items to the cart by calling the `addItem()` function, but they can still access the `items` property
 to see what's inside the cart.
 
-> Name backing properties with a leading underscore to avoid name clashes with other properties.
+> We recommend naming backing properties with a leading underscore.
 >
 {style="tip"}
+
+On the JVM, the compiler optimizes access to private properties with default getters and setters to avoid function call overhead.
 
 Backing properties are also useful when you want more than one public property to share a state. For example:
 
@@ -354,7 +358,7 @@ is one source of truth but two public views.
 
 If the value of a read-only property is known at compile time, mark it as a _compile-time constant_ using the `const` modifier.
 Compile-time constants are inlined at compile time, so every reference is replaced with its actual value. They are accessed
-more efficiently as no getter is called and no memory is allocated for the property.
+more efficiently as no getter is called.
 
 ```kotlin
 // File: AppConfig.kt
@@ -387,7 +391,7 @@ const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 
 ## Late-initialized properties and variables
 
-Normally, properties declared as having a non-nullable type must be initialized in the constructor.
+Normally, properties must be initialized in the constructor.
 However, it's often the case that doing so isn't convenient. For example, properties can be initialized through dependency
 injection, or in the setup method of a unit test. In these cases, you can't supply a non-nullable initializer in the constructor,
 but you still want to avoid null checks when referencing the property inside the body of a class.
