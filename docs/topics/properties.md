@@ -98,20 +98,20 @@ fun main() {
     val contact = PersonContact()
     // Access properties in the contact instance
     println("Email: ${contact.email}")
-    // Email: sherlock@detective.com
+    // Email: sherlock@email.com
 }
 //sampleEnd
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-access-properties"}
 
-By default, properties must be initialized immediately. However, there is a way to [initialize them later](#late-initialized-properties-and-variables).
+In Kotlin, we recommend initializing properties when you declare them to keep your code safe and easy to read. However, 
+it's possible to [initialize them later](#late-initialized-properties-and-variables) for special cases.
 
 Declaring the property type is optional if it can be inferred from the initializer or the getter's return type:
 
 ```kotlin
 var initialized = 1 // The inferred type is Int
-var allByDefault    
-// ERROR: Property must be initialized.
+var allByDefault    // ERROR: Property must be initialized.
 ```
 {validate="false"}
 
@@ -170,7 +170,7 @@ fun main() {
 
 ### Changing visibility or adding annotations
 
-You can change accessor visibility or add annotations without replacing the default implementation. To make your code concise,
+You can change accessor visibility or add [annotations](annotations.md) without replacing the default implementation. To make your code concise,
 in Kotlin you don't have to make these changes within a body.
 
 For example, if you want to make the setter private but keep the default implementation:
@@ -225,13 +225,16 @@ class Service {
 fun main() {
     val service = Service()
     println(service.dependency)
+    // Default service
+    println(service::dependency.getter.annotations)
+    // [@Inject()]
+    println(service::dependency.setter.annotations)
+    // []
 }
 ```
-{kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-annotate-getter"}
+{validate="false"}
 
-> To learn more about annotations, see [Annotations](annotations.md).
->
-{style="tip"}
+This example uses [reflection](reflection.md) to show which annotations are present on the getter and setter.
 
 ### Backing fields
 
@@ -282,7 +285,7 @@ called a _backing property_.
 For example, you have a `ShoppingCart` class with an `items` property that contains everything inside the shopping cart.
 You want to make the `items` property read-only outside the class, but you want to allow one "approved" way for the user to modify
 the `items` property directly. In your code, you create a backing property called `_items` which is private, and you also create a normal property
-called `items` which is public and initializes to the value of the backing property.
+called `items` which is public and delegates to the value of the backing property.
 
 ```kotlin
 class ShoppingCart {
@@ -320,7 +323,7 @@ fun main() {
 The user can only add items to the cart by calling the `addItem()` function, but they can still access the `items` property
 to see what's inside the cart.
 
-> We recommend naming backing properties with a leading underscore.
+> We recommend following the common pattern of naming backing properties with a leading underscore.
 >
 {style="tip"}
 
