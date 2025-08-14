@@ -120,7 +120,7 @@ var allByDefault    // ERROR: Property must be initialized.
 By default, Kotlin generates getters and setters behind the scenes. You can define your own custom accessors for a property
 when you need extra logic such as validation, formatting, or calculations based on other properties.
 
-If you define a custom getter, Kotlin calls it every time property the property is accessed. For example:
+If you define a custom getter, Kotlin calls it every time the property is accessed. For example:
 
 ```kotlin
 //sampleStart
@@ -143,7 +143,7 @@ val area get() = this.width * this.height
 ```
 
 A custom setter runs every time you assign a value to the property, except during initialization.
-By convention, the name of the setter parameter is `value`, but you can choose a different name if you prefer:
+By convention, the name of the setter parameter is `value`, but you can choose a different name:
 
 ```kotlin
 class Point(var x: Int, var y: Int) {
@@ -375,7 +375,7 @@ const val MAX_LOGIN_ATTEMPTS = 3
 
 Compile-time constants must satisfy the following requirements:
 
-* They must be either a top-level property, or a member of an [`object` declaration](object-declarations.md#object-declarations-overview) or a _[companion object](object-declarations.md#companion-objects)_.
+* They must be either a top-level property, or a member of an [`object` declaration](object-declarations.md#object-declarations-overview) or a [companion object](object-declarations.md#companion-objects).
 * They must be initialized with a value of type `String` or a [primitive type](basic-types.md).
 * They can't have a custom getter.
 
@@ -393,8 +393,7 @@ const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 
 Normally, properties must be initialized in the constructor.
 However, it's often the case that doing so isn't convenient. For example, properties can be initialized through dependency
-injection, or in the setup method of a unit test. In these cases, you can't supply a non-nullable initializer in the constructor,
-but you still want to avoid null checks when referencing the property inside the body of a class.
+injection, or in the setup method of a unit test.
 
 To handle such cases, you can mark the property with the `lateinit` modifier:
 
