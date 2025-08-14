@@ -2,7 +2,7 @@
 
 Properties in Kotlin let you store and manage data without writing functions to access or change the data.
 You can use properties in [classes](classes.md), [interfaces](interfaces.md), [objects](object-declarations.md), [companion objects](object-declarations.md#companion-objects),
-and even outside these structures.
+and even outside these structures as top-level properties.
 
 Every property has a name, a type, and an automatically generated `get()` function called a getter, which allows you to read the value of the property.
 If the property is mutable, there is also a `set()` function called a setter, which allows you to change the value of the property.
@@ -14,7 +14,8 @@ If the property is mutable, there is also a `set()` function called a setter, wh
 ## Declaring properties
 
 Properties can be mutable, using the `var` keyword, or read-only, using the `val` keyword.
-You can declare them outside a class, interface, or object in a `.kt` file:
+You can declare them as a top-level property in a `.kt` file. Think of a top-level property as a global variable
+that belongs to a package:
 
 ```kotlin
 // File: Constants.kt
@@ -103,13 +104,14 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-access-properties"}
 
-You don't have to initialize a property immediately. It can be [initialized later](#late-initialized-properties-and-variables), like the `email` property in the `ContactInfo` interface.
+By default, properties must be initialized immediately. However, there is a way to [initialize them later](#late-initialized-properties-and-variables).
+
 Declaring the property type is optional if it can be inferred from the initializer or the getter's return type:
 
 ```kotlin
 var initialized = 1 // The inferred type is Int
 var allByDefault    
-// ERROR: This variable must either have an explicit type or be initialized.
+// ERROR: Property must be initialized.
 ```
 {validate="false"}
 
@@ -373,11 +375,6 @@ Compile-time constants must satisfy the following requirements:
 * They must be either a top-level property, or a member of an [`object` declaration](object-declarations.md#object-declarations-overview) or a _[companion object](object-declarations.md#companion-objects)_.
 * They must be initialized with a value of type `String` or a [primitive type](basic-types.md).
 * They can't have a custom getter.
-
-> A top-level property is a property declared directly in a `.kt` file, not inside a class, interface, or object.
-> Think of it as a global variable or constant that belongs to the package.
-> 
-{style="tip"}
 
 Compile-time constants still have a backing field, so you can interact with them using [reflection](reflection.md).
 
