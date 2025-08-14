@@ -1,11 +1,11 @@
 [//]: # (title: Properties)
 
-Properties in Kotlin let you store and manage data without writing functions to access or change the data.
+In Kotlin, properties let you store and manage data without writing functions to access or change the data.
 You can use properties in [classes](classes.md), [interfaces](interfaces.md), [objects](object-declarations.md), [companion objects](object-declarations.md#companion-objects),
 and even outside these structures as top-level properties.
 
-Every property has a name, a type, and an automatically generated `get()` function called a getter, which allows you to read the value of the property.
-If the property is mutable, there is also a `set()` function called a setter, which allows you to change the value of the property.
+Every property has a name, a type, and an automatically generated `get()` function called a getter, which allows you to read the property's value.
+If the property is mutable, it also has a `set()` function called a setter, which allows you to change the property's value.
 
 > Getters and setters are called _accessors_.
 > 
@@ -13,7 +13,7 @@ If the property is mutable, there is also a `set()` function called a setter, wh
 
 ## Declaring properties
 
-Properties can be mutable, using the `var` keyword, or read-only, using the `val` keyword.
+Properties can be mutable (`var`) or read-only (`val`).
 You can declare them as a top-level property in a `.kt` file. Think of a top-level property as a global variable
 that belongs to a package:
 
@@ -25,7 +25,7 @@ val pi = 3.14159
 var counter = 0
 ```
 
-You can also declare them inside a class, interface, or object:
+You can also declare properties inside a class, interface, or object:
 
 ```kotlin
 // Class with properties
@@ -105,9 +105,9 @@ fun main() {
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-access-properties"}
 
 In Kotlin, we recommend initializing properties when you declare them to keep your code safe and easy to read. However, 
-it's possible to [initialize them later](#late-initialized-properties-and-variables) for special cases.
+you can [initialize them later](#late-initialized-properties-and-variables) in special cases.
 
-Declaring the property type is optional if it can be inferred from the initializer or the getter's return type:
+Declaring the property type is optional if the compiler can infer it from the initializer or the getter's return type:
 
 ```kotlin
 var initialized = 1 // The inferred type is Int
@@ -117,10 +117,10 @@ var allByDefault    // ERROR: Property must be initialized.
 
 ## Custom getters and setters
 
-By default, Kotlin generates getters and setters behind the scenes. You can define your own custom accessors for a property
-when you need extra logic such as validation, formatting, or calculations based on other properties.
+By default, Kotlin generates getters and setters behind the scenes. You can define your own custom accessors when
+you need extra logic, such as validation, formatting, or calculations based on other properties.
 
-If you define a custom getter, Kotlin calls it every time the property is accessed. For example:
+A custom getter runs every time the property is accessed:
 
 ```kotlin
 //sampleStart
@@ -136,7 +136,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-custom-getter"}
 
-You can omit the property type if it can be inferred from the getter:
+You can omit the type if the compiler can infer it from the getter:
 
 ```kotlin
 val area get() = this.width * this.height
@@ -239,13 +239,13 @@ This example uses [reflection](reflection.md) to show which annotations are pres
 ### Backing fields
 
 In Kotlin, accessors use backing fields to hold the property's value in memory. Backing fields are useful
-when you want to add extra logic to your getter and setter or if you want to trigger
-an additional action when a property is modified.
+when you want to add extra logic to your getter and setter, or when you want to trigger an additional action whenever the property
+changes.
 
-You can't declare backing fields directly. Kotlin generates them when it's necessary. You can reference the backing field in accessors using
-the `field` keyword.
+You can't declare backing fields directly. Kotlin generates them only when necessary. You can reference the backing field
+in accessors using the `field` keyword.
 
-Kotlin only generates backing fields if you use the default getter or setter or if you use ` field` in at least one of your custom accessors.
+Kotlin only generates backing fields if you use the default getter or setter, or if you use ` field` in at least one custom accessor.
 
 For example, there is no backing field in this case because it uses a custom getter without the `field` keyword:
 
@@ -278,14 +278,14 @@ fun main() {
 
 ### Backing properties
 
-In some cases, you might want more flexibility than using a backing field can provide. For example, if you have an API
+Sometimes you might want more flexibility than using a backing field can provide. For example, if you have an API
 where you want to be able to modify the property internally but not externally. In such cases, you can use a coding pattern
 called a _backing property_.
 
-For example, you have a `ShoppingCart` class with an `items` property that contains everything inside the shopping cart.
-You want to make the `items` property read-only outside the class, but you want to allow one "approved" way for the user to modify
-the `items` property directly. In your code, you create a backing property called `_items` which is private, and you also create a normal property
-called `items` which is public and delegates to the value of the backing property.
+For example, you have a `ShoppingCart` class with an `items` property that contains everything in the shopping cart.
+You want the `items` property to be read-only outside the class but still allow one "approved" way for the user to modify
+the `items` property directly. In your code, you create a private backing property called `_items` and a public property
+called `items` that delegates to the backing property's value.
 
 ```kotlin
 class ShoppingCart {
@@ -320,8 +320,8 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-property"}
 
-The user can only add items to the cart by calling the `addItem()` function, but they can still access the `items` property
-to see what's inside the cart.
+The user can only add items to the cart through the `addItem()` function, but can still access the `items` property
+to see what's inside.
 
 > We recommend following the common pattern of naming backing properties with a leading underscore.
 >
@@ -356,14 +356,14 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-property-multiple-properties"}
 
-In this example, the backing property `_celsius` is accessed by both the `celsius` and `fahrenheit` properties. So there 
-is one source of truth but two public views.
+In this example, the `_celsius` backing property is accessed by both the `celsius` and `fahrenheit` properties. This setup
+provides one source of truth with two public views.
 
 ## Compile-time constants
 
 If the value of a read-only property is known at compile time, mark it as a _compile-time constant_ using the `const` modifier.
-Compile-time constants are inlined at compile time, so every reference is replaced with its actual value. They are accessed
-more efficiently as no getter is called.
+Compile-time constants are inlined at compile time, so each reference is replaced with its actual value. They are accessed
+more efficiently because no getter is called.
 
 ```kotlin
 // File: AppConfig.kt
@@ -373,7 +373,7 @@ package com.example
 const val MAX_LOGIN_ATTEMPTS = 3
 ```
 
-Compile-time constants must satisfy the following requirements:
+Compile-time constants must meet the following requirements:
 
 * They must be either a top-level property, or a member of an [`object` declaration](object-declarations.md#object-declarations-overview) or a [companion object](object-declarations.md#companion-objects).
 * They must be initialized with a value of type `String` or a [primitive type](basic-types.md).
@@ -381,7 +381,7 @@ Compile-time constants must satisfy the following requirements:
 
 Compile-time constants still have a backing field, so you can interact with them using [reflection](reflection.md).
 
-These properties have the added benefit that they can also be used in annotations:
+These properties have the added benefit that you can use them in annotations:
 
 ```kotlin
 const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
@@ -391,11 +391,11 @@ const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 
 ## Late-initialized properties and variables
 
-Normally, properties must be initialized in the constructor.
-However, it's often the case that doing so isn't convenient. For example, properties can be initialized through dependency
-injection, or in the setup method of a unit test.
+Normally, you must initialize properties in the constructor.
+However, in some cases, doing so isn't convenient. For example, you might initialize properties through dependency
+injection or inside the setup method of a unit test.
 
-To handle such cases, you can mark the property with the `lateinit` modifier:
+To handle these situations, you can mark the property with the `lateinit` modifier:
 
 ```kotlin
 public class OrderServiceTest {
@@ -413,11 +413,20 @@ public class OrderServiceTest {
 }
 ```
 
-The `lateinit` modifier can be used on `var` properties declared inside top-level properties and local variables, as well as the body of a class.
-For classes, the property can't be declared in the primary constructor, and it must not have a custom getter or setter.
-In addition, the type of the property or variable must be non-nullable, and it must not be a [primitive type](basic-types.md).
+You can use the `lateinit` modifier on `var` properties declared as:
 
-Accessing a `lateinit` property before it has been initialized throws a special exception that clearly identifies the property
+* Top-level properties.
+* Local variables.
+* Properties inside the body of a class.
+
+For class properties:
+
+* You can't declare them in the primary constructor.
+* They must not have a custom getter or setter.
+
+In all cases, the property or variable must be non-nullable and must not be a [primitive type](basic-types.md).
+
+If you access a `lateinit` property before initializing it, Kotlin throws a specific exception that identifies the property
 being accessed:
 
 ```kotlin
@@ -468,7 +477,7 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property-check-initialization"}
 
-You can only use `isInitialized` on a property if you can already access the property in your code. The property must be declared
+You can only use `isInitialized` on a property if you can already access that property in your code. The property must be declared
 in the same class, in an outer class, or as a top-level property in the same file.
 
 ## Overriding properties
@@ -480,7 +489,11 @@ See [Overriding properties](inheritance.md#overriding-properties).
 The most common kind of property simply reads from (and possibly writes to) a backing field using the default getter and setter, while
 custom getters and setters let you define any kind of property behavior.
 
-Between these two, there are common patterns for how properties work. Examples include computing a value lazily,
-reading from a map by a given key, accessing a database, or notifying a listener when a property is accessed.
+Between these two, there are common patterns for how properties work. Examples include:
+
+* Computing a value lazily.
+* Reading from a map by a given key.
+* Accessing a database.
+* Notifying a listener when a property is accessed.
 
 You can implement these common behaviors as libraries using [delegated properties](delegated-properties.md).
