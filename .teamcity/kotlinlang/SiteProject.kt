@@ -2,6 +2,7 @@ package kotlinlang
 
 import jetbrains.buildServer.configs.kotlin.Project
 import kotlinlang.builds.*
+import kotlinlang.builds.landing.LandingPages
 import kotlinlang.vcsRoots.GrammarGenerator
 import kotlinlang.vcsRoots.KotlinSpec
 import kotlinlang.vcsRoots.WebHelp
@@ -20,7 +21,7 @@ object SiteProject : Project({
         BuildKotlinSpec,
         BuildJsAssets,
         PageViews,
-        BuildPythonContainer
+        BuildPythonContainer,
     )
 
     buildTypesOrder.forEach {
@@ -28,6 +29,7 @@ object SiteProject : Project({
     }
 
     template(DockerImageBuilder)
+    subProjects(LandingPages)
 
     vcsRoot(GrammarGenerator)
     vcsRoot(KotlinSpec)
