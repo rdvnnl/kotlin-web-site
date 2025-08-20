@@ -8,12 +8,13 @@ import vcsRoots.KotlinLangOrg
 
 object LandingPages : Project({
     name = "Landing Pages"
-    vcsRoot(KotlinLangOrg)
     buildType(BuildLandingPages)
 })
 
 object BuildLandingPages: BuildType ({
     name = "Build landing pages"
+
+    artifactRules = "landings/%LANDING_NAME%/public => build.zip"
 
     params {
         select(
