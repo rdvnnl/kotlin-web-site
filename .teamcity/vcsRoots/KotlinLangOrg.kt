@@ -18,7 +18,7 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 //})
 
 
-object KotlinLangVcs: GitVcsRoot({
+object KotlinLangOrg: GitVcsRoot({
     name = "kotlinlang.org VCS root"
     url = "ssh://git@github.com/JetBrains/kotlin-web-site"
     branch = "refs/heads/master"
