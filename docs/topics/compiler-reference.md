@@ -9,7 +9,7 @@ These compilers are used by:
 * Maven, when you call `mvn compile` or `mvn test-compile` in a console or in the IDE.
 
 You can also run Kotlin compilers manually from the command line as described 
-in the [Working with command-line compiler](command-line.md) tutorial. 
+in the [Working with command-line compiler](command-line.md) tutorial.
 
 ## Compiler options
 
@@ -37,6 +37,12 @@ For details, see [Maven](maven.md#specify-compiler-options).
   > $ kotlinc.bat hello.kt -include-runtime -d "My Folder\hello.jar"
   > ```
   {style="note"}
+
+## DSL for compiler options
+
+A single source for all compiler options is available as a JAR artifact, published under `org.jetbrains.kotlin:kotlin-compiler-arguments-description`.
+This artifact includes both a code representation and a JSON equivalent (for non-Kotlin consumers) of all compiler option
+descriptions, along with metadata such as the version in which each option was introduced or stabilized.
 
 ## Common options
 
