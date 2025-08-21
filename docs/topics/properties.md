@@ -4,8 +4,9 @@ In Kotlin, properties let you store and manage data without writing functions to
 You can use properties in [classes](classes.md), [interfaces](interfaces.md), [objects](object-declarations.md), [companion objects](object-declarations.md#companion-objects),
 and even outside these structures as top-level properties.
 
-Every property has a name, a type, and an automatically generated `get()` function called a getter, which allows you to read the property's value.
-If the property is mutable, it also has a `set()` function called a setter, which allows you to change the property's value.
+Every property has a name, a type, and an automatically generated `get()` function called a getter. You can use the getter
+to read the property's value. If the property is mutable, it also has a `set()` function called a setter, which allows 
+you to change the property's value.
 
 > Getters and setters are called _accessors_.
 > 
@@ -37,7 +38,7 @@ class Address {
 
 // Interface with a property
 interface ContactInfo {
-    val email: String  // Abstract property, must be implemented
+    val email: String
 }
 
 // Object with properties
@@ -77,7 +78,7 @@ class PersonContact : ContactInfo {
 //sampleStart
 fun copyAddress(address: Address): Address {
     val result = Address()
-    // Access properties in the Address class
+    // Accesses properties in the result instance
     result.name = address.name
     result.street = address.street
     result.city = address.city
@@ -87,11 +88,11 @@ fun copyAddress(address: Address): Address {
 fun main() {
     val sherlockAddress = Address()
     val copy = copyAddress(sherlockAddress)
-    // Access properties in the copy instance
+    // Accesses properties in the copy instance
     println("Copied address: ${copy.name}, ${copy.street}, ${copy.city}")
     // Copied address: Holmes, Sherlock, Baker, London
 
-    // Access properties in the object
+    // Accesses properties in the Company object
     println("Company: ${Company.name} in ${Company.country}")
     // Company: Detective Inc. in UK
     
@@ -117,7 +118,7 @@ var allByDefault    // ERROR: Property must be initialized.
 
 ## Custom getters and setters
 
-By default, Kotlin generates getters and setters behind the scenes. You can define your own custom accessors when
+By default, Kotlin automatically generates getters and setters. You can define your own custom accessors when
 you need extra logic, such as validation, formatting, or calculations based on other properties.
 
 A custom getter runs every time the property is accessed:
@@ -170,10 +171,10 @@ fun main() {
 
 ### Changing visibility or adding annotations
 
-You can change accessor visibility or add [annotations](annotations.md) without replacing the default implementation. To make your code concise,
-in Kotlin you don't have to make these changes within a body.
+In Kotlin, you can change accessor visibility or add [annotations](annotations.md) without replacing the default implementation. 
+You don't have to make these changes within a body `{}`.
 
-For example, if you want to make the setter private but keep the default implementation:
+To change the visibility of an accessor, use the modifier before the `get` or `set` keyword:
 
 ```kotlin
 class BankAccount(initialBalance: Int) {
@@ -209,16 +210,16 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-private-setter"}
 
-Or if you want to annotate the getter but keep the default implementation:
+To annotate an accessor, use the annotation before the `get` or `set` keyword:
 
 ```kotlin
-// Inject annotation
+// Defines an annotation that can be applied to a getter
 @Target(AnnotationTarget.PROPERTY_GETTER)
 annotation class Inject
 
 class Service {
     var dependency: String = "Default Service"
-        // Annotate the getter
+        // Annotates the getter
         @Inject get 
 }
 
@@ -238,8 +239,8 @@ This example uses [reflection](reflection.md) to show which annotations are pres
 
 ### Backing fields
 
-In Kotlin, accessors use backing fields to hold the property's value in memory. Backing fields are useful
-when you want to add extra logic to your getter and setter, or when you want to trigger an additional action whenever the property
+In Kotlin, accessors use backing fields to store the property's value in memory. Backing fields are useful
+when you want to add extra logic to a getter or setter, or when you want to trigger an additional action whenever the property
 changes.
 
 You can't declare backing fields directly. Kotlin generates them only when necessary. You can reference the backing field
@@ -247,21 +248,21 @@ in accessors using the `field` keyword.
 
 Kotlin only generates backing fields if you use the default getter or setter, or if you use ` field` in at least one custom accessor.
 
-For example, there is no backing field in this case because it uses a custom getter without the `field` keyword:
+For example, the `isEmpty` property has no backing field because it uses a custom getter without the `field` keyword:
 
 ```kotlin
 val isEmpty: Boolean
     get() = this.size == 0
 ```
 
-In this example, there is a backing field because the setter uses the `field` keyword:
+In this example, the `score` property has a backing field because the setter uses the `field` keyword:
 
 ```kotlin
 class Scoreboard {
     var score: Int = 0
         set(value) {
             field = value
-            // Additional action of printing a log message
+            // Adds logging when updating the value
             println("Score updated to $field")
         }
 }
@@ -278,13 +279,13 @@ fun main() {
 
 ### Backing properties
 
-Sometimes you might want more flexibility than using a backing field can provide. For example, if you have an API
+Sometimes you might need more flexibility than using a [backing field](#backing-fields) can provide. For example, if you have an API
 where you want to be able to modify the property internally but not externally. In such cases, you can use a coding pattern
 called a _backing property_.
 
-For example, you have a `ShoppingCart` class with an `items` property that contains everything in the shopping cart.
+In the following example, the `ShoppingCart` class has an `items` property that represents everything in the shopping cart.
 You want the `items` property to be read-only outside the class but still allow one "approved" way for the user to modify
-the `items` property directly. In your code, you create a private backing property called `_items` and a public property
+the `items` property directly. To achieve this, you can define a private backing property called `_items` and a public property
 called `items` that delegates to the backing property's value.
 
 ```kotlin
@@ -320,14 +321,14 @@ fun main() {
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-property"}
 
-The user can only add items to the cart through the `addItem()` function, but can still access the `items` property
-to see what's inside.
+In this example, the user can only add items to the cart through the `addItem()` function, but can still access the 
+`items` property to see what's inside.
 
-> We recommend following the common pattern of naming backing properties with a leading underscore.
+> Use a leading underscore when naming backing properties to follow Kotlin [coding conventions](coding-conventions.md#names-for-backing-properties).
 >
 {style="tip"}
 
-On the JVM, the compiler optimizes access to private properties with default getters and setters to avoid function call overhead.
+On the JVM, the compiler optimizes access to private properties with default accessors to avoid function call overhead.
 
 Backing properties are also useful when you want more than one public property to share a state. For example:
 
@@ -348,22 +349,24 @@ class Temperature {
 fun main() {
     val temp = Temperature()
     temp.celsius = 25.0
-    println("${temp.celsius}°C = ${temp.fahrenheit}°F") // 25.0°C = 77.0°F
+    println("${temp.celsius}°C = ${temp.fahrenheit}°F") 
+    // 25.0°C = 77.0°F
 
     temp.fahrenheit = 212.0
-    println("${temp.celsius}°C = ${temp.fahrenheit}°F") // 100.0°C = 212.0°F
+    println("${temp.celsius}°C = ${temp.fahrenheit}°F") 
+    // 100.0°C = 212.0°F
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-backing-property-multiple-properties"}
 
 In this example, the `_celsius` backing property is accessed by both the `celsius` and `fahrenheit` properties. This setup
-provides one source of truth with two public views.
+provides a single source of truth with two public views.
 
 ## Compile-time constants
 
 If the value of a read-only property is known at compile time, mark it as a _compile-time constant_ using the `const` modifier.
 Compile-time constants are inlined at compile time, so each reference is replaced with its actual value. They are accessed
-more efficiently because no getter is called.
+more efficiently because no getter is called:
 
 ```kotlin
 // File: AppConfig.kt
@@ -381,7 +384,7 @@ Compile-time constants must meet the following requirements:
 
 Compile-time constants still have a backing field, so you can interact with them using [reflection](reflection.md).
 
-These properties have the added benefit that you can use them in annotations:
+You can also use these properties in annotations:
 
 ```kotlin
 const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
@@ -392,10 +395,10 @@ const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
 ## Late-initialized properties and variables
 
 Normally, you must initialize properties in the constructor.
-However, in some cases, doing so isn't convenient. For example, you might initialize properties through dependency
+However, this isn't always convenient. For example, you might initialize properties through dependency
 injection or inside the setup method of a unit test.
 
-To handle these situations, you can mark the property with the `lateinit` modifier:
+To handle these situations, mark the property with the `lateinit` modifier:
 
 ```kotlin
 public class OrderServiceTest {
@@ -406,7 +409,7 @@ public class OrderServiceTest {
     }
 
     @Test fun processesOrderSuccessfully() {
-        // Dereference directly without checking for null
+        // Calls orderService directly without checking for null
         // or initialization
         orderService.processOrder()  
     }
@@ -426,15 +429,16 @@ For class properties:
 
 In all cases, the property or variable must be non-nullable and must not be a [primitive type](basic-types.md).
 
-If you access a `lateinit` property before initializing it, Kotlin throws a specific exception that identifies the property
-being accessed:
+If you access a `lateinit` property before initializing it, Kotlin throws a specific exception that identifies the uninitialized
+property being accessed:
 
 ```kotlin
 class ReportGenerator {
     lateinit var report: String
 
     fun printReport() {
-        // Access before initialization
+        // Throws an exception as it's accessed before
+        // initialization
         println(report)
     }
 }
@@ -443,12 +447,11 @@ fun main() {
     val generator = ReportGenerator()
     generator.printReport()
     // Exception in thread "main" kotlin.UninitializedPropertyAccessException: lateinit property report has not been initialized
-    //   at ReportGenerator.getReport (File.kt:2) 
 }
 ```
 {kotlin-runnable="true" kotlin-min-compiler-version="1.3" id="kotlin-lateinit-property" validate="false"}
 
-To check whether a `lateinit var` has already been initialized, use the [`isInitialized`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-lazy/is-initialized.html)
+To check whether a `lateinit var` has already been initialized, use the [`isInitialized`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/is-initialized.html)
 property on the [reference to that property](reflection.md#property-references):
 
 ```kotlin
@@ -456,7 +459,7 @@ class WeatherStation {
     lateinit var latestReading: String
 
     fun printReading() {
-        // Check whether the property is initialized
+        // Checks whether the property is initialized
         if (this::latestReading.isInitialized) {
             println("Latest reading: $latestReading")
         } else {
@@ -486,14 +489,15 @@ See [Overriding properties](inheritance.md#overriding-properties).
 
 ## Delegated properties
 
-The most common kind of property simply reads from (and possibly writes to) a backing field using the default getter and setter, while
-custom getters and setters let you define any kind of property behavior.
+To reuse logic and reduce code duplication, you can delegate the responsibility of getting and setting a property to a
+separate object.
 
-Between these two, there are common patterns for how properties work. Examples include:
+Delegating the accessor behavior keeps the property's accessor logic in one place. This approach is useful when
+implementing behaviors like:
 
 * Computing a value lazily.
 * Reading from a map by a given key.
 * Accessing a database.
 * Notifying a listener when a property is accessed.
 
-You can implement these common behaviors as libraries using [delegated properties](delegated-properties.md).
+You can implement these common behaviors in libraries for reuse across your project. For more information, see [delegated properties](delegated-properties.md).
