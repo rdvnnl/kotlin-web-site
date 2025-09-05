@@ -1,4 +1,4 @@
-# Kotlin website
+cf6488f852b68c7e3bbc6573f23601b155ae3aef# Kotlin website
 [![Official project][project-badge]][project-url]
 [![Qodana Code Quality Check](https://github.com/JetBrains/kotlin-web-site/actions/workflows/qodana-code-quality-check.yml/badge.svg)](https://github.com/JetBrains/kotlin-web-site/actions/workflows/qodana-code-quality-check.yml)
 
